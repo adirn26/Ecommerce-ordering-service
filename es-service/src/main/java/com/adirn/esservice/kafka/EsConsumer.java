@@ -27,7 +27,7 @@ public class EsConsumer {
     @KafkaListener(topics = "${spring.kafka.topic.name}",
             groupId = "${spring.kafka.consumer.group-id}")
     public void consume(Customer customer){
-        logger.info(String.format("Customer object recieved in email service => %s", customer.toString()));
+        logger.info(String.format("Customer object recieved in ES service => %s", customer.toString()));
         //save the email to the customer
         CustomerES customerES = new CustomerES();
         customerES.setId(customer.getId());
@@ -41,7 +41,7 @@ public class EsConsumer {
     @KafkaListener(topics = "${order.kafka.topic.name}",
             groupId = "${spring.kafka.consumer.group-id}")
     public void consume(OrderEvent orderEvent){
-        logger.info(String.format("Order event received in email service => %s", orderEvent.toString()));
+        logger.info(String.format("Order event received in ES service => %s", orderEvent.toString()));
         //save the email to the customer
         OrderEventES orderEventES = new OrderEventES();
         orderEventES.setMessage(orderEvent.getMessage());
