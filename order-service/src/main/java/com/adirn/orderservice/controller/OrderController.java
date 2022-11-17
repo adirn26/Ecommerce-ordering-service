@@ -8,6 +8,8 @@ import com.adirn.orderservice.kafka.OrderProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +32,7 @@ public class OrderController {
     OrderProducer orderProducer;
 
     @PostMapping("/order")
-    public String placeOrder(@RequestBody Order order){
+    public String placeOrder(@RequestBody Order order) throws Exception {
         order.setId(UUID.randomUUID().toString());
         OrderEvent orderEvent = new OrderEvent();
         orderEvent.setMessage("order status is in pending state");
@@ -42,14 +44,22 @@ public class OrderController {
         //getting customer data
         Map<String,Integer> uriparam = new HashMap<>();
         uriparam.put("id", order.getCid());
-        Customer customerRes = restTemplate.getForObject(customerUri,Customer.class, uriparam);
-        orderEvent.setCustomer(customerRes);
+//        Customer customerRes = restTemplate.getForObject(customerUri,Customer.class, uriparam);
+        ResponseEntity<?> customerRes = restTemplate.getForEntity(customerUri, Customer.class, uriparam);
+        if(customerRes.getStatusCode()!= HttpStatus.OK){
+            throw new Exception((String) customerRes.getBody());
+        }
+        orderEvent.setCustomer((Customer) customerRes.getBody());
 
         //getting Product data
         Map<String, Integer> productparam = new HashMap<>();
         productparam.put("id", order.getPid());
-        Product product = restTemplate.getForObject(productUri, Product.class, productparam);
-        orderEvent.setProduct(product);
+//        Product product = restTemplate.getForObject(productUri, Product.class, productparam);
+        ResponseEntity<?> product = restTemplate.getForEntity(productUri, Product.class, productparam);
+        if(product.getStatusCode()!=HttpStatus.OK){
+            throw new Exception((String) product.getBody());
+        }
+        orderEvent.setProduct((Product) product.getBody());
 
         orderProducer.sendMessage(orderEvent);
         return "Order Placed ......";

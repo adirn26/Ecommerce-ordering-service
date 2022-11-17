@@ -35,7 +35,7 @@ public class EsConsumer {
         customerES.setEmail(customer.getEmail());
         customerES.setAge(customer.getAge());
         customerRepo.save(customerES);
-        logger.info("Saved to es db");
+        logger.info("Saved customer to es db");
     }
 
     @KafkaListener(topics = "${order.kafka.topic.name}",
@@ -51,7 +51,7 @@ public class EsConsumer {
         orderEventES.setCustomer(orderEvent.getCustomer());
         orderEventES.setStatus(orderEvent.getStatus());
         orderEventRepo.save(orderEventES);
-        logger.info("Saved into DB");
+        logger.info("Saved Order event to es DB");
 
     }
 
