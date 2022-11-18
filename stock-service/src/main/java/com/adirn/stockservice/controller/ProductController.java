@@ -2,6 +2,9 @@ package com.adirn.stockservice.controller;
 
 import com.adirn.basemodels.models.Product;
 import com.adirn.stockservice.repository.ProductRepo;
+import com.adirn.stockservice.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +15,13 @@ import java.util.List;
 @RestController
 public class ProductController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     @Autowired
     ProductRepo repo;
+
+    @Autowired
+    ProductService productService;
 
     @PostMapping("/products")
     public ResponseEntity<?> newProduct(@RequestBody Product product){
@@ -29,7 +37,6 @@ public class ProductController {
 
     @GetMapping("/products/{id}")
     public ResponseEntity<?> getById(@PathVariable int id){
-        Product product = repo.findById(id).get();
-        return new ResponseEntity<Product>(product, HttpStatus.OK);
+        return new ResponseEntity<Product>(productService.getbyid(id), HttpStatus.OK);
     }
 }

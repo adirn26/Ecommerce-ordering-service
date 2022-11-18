@@ -1,12 +1,14 @@
 package com.adirn.esservice.controller;
 
 import com.adirn.basemodels.models.Customer;
+import com.adirn.basemodels.models.OrderEvent;
 import com.adirn.esservice.model.CustomerES;
 import com.adirn.esservice.model.OrderEventES;
 import com.adirn.esservice.repository.CustomerRepo;
 import com.adirn.esservice.repository.OrderEventRepo;
 import com.adirn.esservice.service.QueryDslService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,4 +49,14 @@ public class Controller {
         List<CustomerES> customers = queryDslService.multiMatch(text);
         return customers;
     }
+
+    @PutMapping("/orders/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable String id){
+        OrderEventES orderEvent =  orderEventRepo.findById(id).get();
+        orderEvent.setStatus("SUCCESSFULL");
+        orderEvent.setMessage("ORDER PLACED.......");
+        orderEventRepo.save(orderEvent);
+        return new ResponseEntity<>("Succesfull...", HttpStatus.OK);
+    }
+
 }

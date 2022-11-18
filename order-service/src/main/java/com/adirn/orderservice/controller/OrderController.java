@@ -31,15 +31,18 @@ public class OrderController {
     @Autowired
     OrderProducer orderProducer;
 
+    @Autowired
+    RestTemplate restTemplate;
+
     @PostMapping("/order")
     public String placeOrder(@RequestBody Order order) throws Exception {
         order.setId(UUID.randomUUID().toString());
         OrderEvent orderEvent = new OrderEvent();
-        orderEvent.setMessage("order status is in pending state");
+        orderEvent.setMessage("Complete the payment");
         orderEvent.setStatus("PENDING");
         orderEvent.setOrder(order);
 
-        RestTemplate restTemplate = new RestTemplate();
+//        RestTemplate restTemplate = new RestTemplate();
 
         //getting customer data
         Map<String,Integer> uriparam = new HashMap<>();
@@ -62,6 +65,6 @@ public class OrderController {
         orderEvent.setProduct((Product) product.getBody());
 
         orderProducer.sendMessage(orderEvent);
-        return "Order Placed ......";
+        return "Order Placed successfully ! Your orderId => "+order.getId();
     }
 }

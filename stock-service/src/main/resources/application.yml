@@ -4,5 +4,3 @@ spring:
     redis:
       time-to-live: 100000
       cache-null-values: true
-  zipkin:
-    baseUrl: http://localhost:9411/

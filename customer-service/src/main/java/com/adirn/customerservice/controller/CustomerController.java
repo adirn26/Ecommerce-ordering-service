@@ -4,6 +4,8 @@ import com.adirn.basemodels.models.Customer;
 import com.adirn.customerservice.kafka.CustomerProducer;
 import com.adirn.customerservice.repository.CustomerRepo;
 import com.adirn.customerservice.service.CustomerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import java.util.List;
 
 @RestController
 public class CustomerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     @Autowired
     CustomerRepo repo;
@@ -41,6 +45,7 @@ public class CustomerController {
     @GetMapping("/customer/{id}")
     public ResponseEntity<?> getbyId(@PathVariable int id){
         Customer customer = customerService.getCust(id);
+        logger.info(customer.toString());
         return new ResponseEntity<Customer>(customer, HttpStatus.OK);
     }
 
