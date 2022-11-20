@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class Controller {
@@ -48,6 +49,18 @@ public class Controller {
     public List<CustomerES> getbytext(@PathVariable String text){
         List<CustomerES> customers = queryDslService.multiMatch(text);
         return customers;
+    }
+
+    @GetMapping("/orders/customer/{id}")
+    public ResponseEntity<?> getOrder(@PathVariable String id){
+        Optional<OrderEventES> order =  orderEventRepo.findById(id);
+        if(order.isEmpty()){
+            return new ResponseEntity<>("Invalid id", HttpStatus.BAD_REQUEST);
+        }
+        else{
+            Customer customer = order.get().getCustomer();
+            return new ResponseEntity<>(customer, HttpStatus.OK);
+        }
     }
 
     @PutMapping("/orders/{id}")

@@ -1,6 +1,9 @@
 package com.adirn.esservice.service;
 
+import com.adirn.basemodels.models.OrderEvent;
 import com.adirn.esservice.model.CustomerES;
+import com.adirn.esservice.model.OrderEventES;
+import com.adirn.esservice.repository.OrderEventRepo;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -20,6 +23,9 @@ public class QueryDslService {
 
     @Autowired
     private ElasticsearchRestTemplate template;
+
+    @Autowired
+    private OrderEventRepo orderEventRepo;
 
     public List<CustomerES> searchMultiField(String firstname, int age){
         QueryBuilder query = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("firstname", firstname))
@@ -46,5 +52,12 @@ public class QueryDslService {
         });
 
         return customermatch;
+    }
+
+    public OrderEventES updateOrder(String id){
+        OrderEventES orderEvent =  orderEventRepo.findById(id).get();
+        orderEvent.setStatus("SUCCESSFULL");
+        orderEvent.setMessage("ORDER PLACED.......");
+        return orderEventRepo.save(orderEvent);
     }
 }
