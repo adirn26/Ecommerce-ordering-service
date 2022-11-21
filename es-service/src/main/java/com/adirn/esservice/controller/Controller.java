@@ -63,13 +63,30 @@ public class Controller {
         }
     }
 
-    @PutMapping("/orders/{id}")
-    public ResponseEntity<?> updateOrder(@PathVariable String id){
-        OrderEventES orderEvent =  orderEventRepo.findById(id).get();
-        orderEvent.setStatus("SUCCESSFULL");
-        orderEvent.setMessage("ORDER PLACED.......");
-        orderEventRepo.save(orderEvent);
-        return new ResponseEntity<>("Succesfull...", HttpStatus.OK);
+//    @PutMapping("/orders/{id}")
+//    public ResponseEntity<?> updateOrder(@PathVariable String id){
+//        OrderEventES orderEvent =  orderEventRepo.findById(id).get();
+//        orderEvent.setStatus("SUCCESSFULL");
+//        orderEvent.setMessage("ORDER PLACED.......");
+//        orderEventRepo.save(orderEvent);
+//        return new ResponseEntity<>("Succesfull...", HttpStatus.OK);
+//    }
+
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<?> getById(@PathVariable String id){
+        OrderEventES orderEventES=orderEventRepo.findById(id).get();
+        return new ResponseEntity<>(orderEventES, HttpStatus.OK);
     }
 
+    @DeleteMapping("/orders/{id}")
+    public ResponseEntity<?> deleteOrder(@PathVariable String id){
+        orderEventRepo.deleteById(id);
+        return new ResponseEntity<>("Deleted order ....", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/orders")
+    public ResponseEntity<?> deleteAll(){
+        orderEventRepo.deleteAll();
+        return new ResponseEntity<>("All orders deleted....", HttpStatus.OK);
+    }
 }
