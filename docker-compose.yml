@@ -1,5 +1,8 @@
 version: '3.7'
 
+networks:
+  loki:
+
 services:
   elasticsearch:
     image: elasticsearch:7.17.0
@@ -8,7 +11,7 @@ services:
     environment:
       - cluster.name= adirn
       - node.name=es01
-      - cluster.initial_master_nodes=es01
+      - discovery.type=single-node
     ulimits:
       memlock:
         soft: -1
@@ -64,4 +67,36 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  loki:
+    image: grafana/loki:2.2.1
+    container_name: loki-service
+    volumes:
+      - ./loki:/etc/loki/
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/loki.yml
+    networks:
+      - loki
+
+
+  promtail:
+    image: grafana/promtail:2.2.1
+    container_name: promtail-service
+    volumes:
+      - ./:/var/log/
+      - ./promtail:/etc/promtail/
+    command: -config.file=/etc/promtail/promtail.yml
+    networks:
+      - loki
+
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-service
+    ports:
+      - "3000:3000"
+    networks:
+      - loki
+
   
