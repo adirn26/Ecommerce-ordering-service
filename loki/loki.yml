@@ -61,3 +61,4 @@ ruler:
   ring:
     kvstore:
       store: inmemory
+  enable_api: true

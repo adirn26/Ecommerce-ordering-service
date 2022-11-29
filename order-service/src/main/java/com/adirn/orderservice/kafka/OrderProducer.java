@@ -5,6 +5,8 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -22,8 +24,12 @@ public class OrderProducer {
     @Autowired
     private KafkaTemplate<String, OrderEvent> kafkaTemplate;
 
+    @Autowired
+    private Tracer tracer;
+
     public void sendMessage(OrderEvent event){
-        logger.info(String.format("Order Event => %s", event.toString()));
+        Span span = tracer.currentSpan();
+        logger.info(String.format("traceId=%s Order Event => %s",span.context().traceId(), event.toString()));
 
         Message<OrderEvent> message = MessageBuilder
                 .withPayload(event)

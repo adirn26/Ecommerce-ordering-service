@@ -10,6 +10,8 @@ import com.adirn.esservice.repository.OrderEventRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +25,14 @@ public class EsConsumer {
 
     @Autowired
     OrderEventRepo orderEventRepo;
+    @Autowired
+    private Tracer tracer;
 
     @KafkaListener(topics = "${spring.kafka.topic.name}",
             groupId = "${spring.kafka.consumer.group-id}")
     public void consume(Customer customer){
-        logger.info(String.format("Customer object recieved in ES service => %s", customer.toString()));
+        Span span = tracer.currentSpan();
+        logger.info(String.format("traceId=%s Customer object recieved in ES service => %s", span.context().traceId(),customer.toString()));
         //save the email to the customer
         CustomerES customerES = new CustomerES();
         customerES.setId(customer.getId());
@@ -41,7 +46,8 @@ public class EsConsumer {
     @KafkaListener(topics = "${order.kafka.topic.name}",
             groupId = "${spring.kafka.consumer.group-id}")
     public void consume(OrderEvent orderEvent){
-        logger.info(String.format("Order event received in ES service => %s", orderEvent.toString()));
+        Span span = tracer.currentSpan();
+        logger.info(String.format("traceId=%s Order event received in ES service => %s",span.context().traceId(), orderEvent.toString()));
         //save the email to the customer
         OrderEventES orderEventES = new OrderEventES();
         orderEventES.setMessage(orderEvent.getMessage());

@@ -1,7 +1,7 @@
 version: '3.7'
 
 networks:
-  loki:
+  ecommerce-spring:
 
 services:
   elasticsearch:
@@ -16,6 +16,9 @@ services:
       memlock:
         soft: -1
         hard: -1
+    networks:
+      - ecommerce-spring
+
 
   kibana:
     image: kibana:7.17.0
@@ -23,6 +26,8 @@ services:
       - '5601:5601'
     depends_on:
       - elasticsearch
+    networks:
+      - ecommerce-spring
 
   logstash:
     image: logstash:7.17.0
@@ -34,16 +39,22 @@ services:
     command: logstash -f /logstash_dir/logstash.conf
     depends_on:
       - elasticsearch
+    networks:
+      - ecommerce-spring
 
   zipkins:
     image: openzipkin/zipkin
     ports:
       - '9411:9411'
+    networks:
+      - ecommerce-spring
 
   redis:
     image: "redis:alpine"
     ports:
       - '6379:6379'
+    networks:
+      - ecommerce-spring
 
   zookeeper:
     image: confluentinc/cp-zookeeper
@@ -51,6 +62,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - ecommerce-spring
 
   broker:
     image: confluentinc/cp-kafka
@@ -67,17 +80,20 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - ecommerce-spring
 
   loki:
     image: grafana/loki:2.2.1
     container_name: loki-service
     volumes:
       - ./loki:/etc/loki/
+      - ./:/var/log/
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/loki.yml
     networks:
-      - loki
+      - ecommerce-spring
 
 
   promtail:
@@ -88,7 +104,7 @@ services:
       - ./promtail:/etc/promtail/
     command: -config.file=/etc/promtail/promtail.yml
     networks:
-      - loki
+      - ecommerce-spring
 
 
   grafana:
@@ -97,6 +113,6 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - loki
+      - ecommerce-spring
 
   
